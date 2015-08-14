@@ -1,9 +1,12 @@
 require 'sinatra/base'
+require 'sinatra/namespace'
 require 'redmon/helpers'
+require 'redis'
 require 'haml'
 
 module Redmon
   class App < Sinatra::Base
+    register Sinatra::Namespace
 
     helpers Redmon::Helpers
 
@@ -16,17 +19,33 @@ module Redmon
       :cache_control => 'public, max-age=3600'
     }
 
-    if Redmon.config.secure
-      use Rack::Auth::Basic do |username, password|
-        [username, password] == Redmon.config.secure.split(':')
-      end
-    end
-
     get '/' do
+      protected!
       haml :app
     end
 
+    get '/health/app' do
+      'okay'
+    end
+
+    get '/health/redis' do
+      begin
+        @result = redis.send "ping"
+        @result = empty_result if @result == []
+        if @result != "PONG"
+          "not okay"
+        else
+          "okay"
+        end
+      rescue ::Redis::CannotConnectError
+        "not okay"
+      rescue
+        "unknown"
+      end
+    end
+
     get '/cli' do
+      protected!
       args = params[:command].split(/ *"(.*?)" *| *'(.*?)' *| /)
       args.reject!(&:empty?)
       @cmd = args.shift.downcase.intern
@@ -45,12 +64,14 @@ module Redmon
     end
 
     post '/config' do
+      protected!
       param = params[:param].intern
       value = params[:value]
       redis.config(:set, param, value) and value
     end
 
     get '/stats' do
+      protected!
       content_type :json
       redis.zrange(stats_key, count, -1).to_json
     end

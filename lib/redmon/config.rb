@@ -13,6 +13,7 @@ module Redmon
       :redis_url     => 'redis://127.0.0.1:6379',
       :app           => true,
       :worker        => true,
+      :base_path     => '/',
       :web_interface => ['0.0.0.0', 4567],
       :poll_interval => 10,
       :data_lifespan => 30,

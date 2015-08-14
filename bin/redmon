@@ -28,6 +28,11 @@ class RedmonCLI
     :default     => 'redis://127.0.0.1:6379',
     :description => "The Redis url for monitor (default: redis://127.0.0.1:6379, note: password is support, ie redis://:password@127.0.0.1:6379)"
 
+  option :base_path,
+    :short       => '-B BASE_PATH',
+    :long        => '--base-path BASE_PATH',
+    :description => "Base path for Sinatra to namespace. Starts with a slash, not a full URL: /path/to/redmon"
+
   option :namespace,
     :short       => '-n NAMESPACE',
     :long        => '--namespace NAMESPACE',

@@ -2,6 +2,17 @@ module Redmon
   module Helpers
     include Redmon::Redis
 
+    def protected!
+      return if authorized? or not Redmon.config.secure
+      headers['WWW-Authenticate'] = 'Basic realm="Redmon"'
+      halt 401, "Not authorized\n"
+    end
+
+    def authorized?
+      @auth ||= Rack::Auth::Basic::Request.new(request.env)
+      @auth.provided? and @auth.basic? and @auth.credentials and @auth.credentials == Redmon.config.secure.split(':')
+    end
+
     def prompt
       "#{redis_url.gsub('://', ' ')}>"
     end

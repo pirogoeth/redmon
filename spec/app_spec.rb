@@ -23,6 +23,23 @@ describe "app" do
     end
   end
 
+  describe "GET /health/app" do
+    it "should return 'okay'" do
+      get "/health/app"
+      last_response.should be_ok
+      last_response.body.include?('okay')
+    end
+  end
+
+  describe "GET /health/redis" do
+    it "should return 'okay'" do
+      stub_redis_cmd :ping
+      get "/health/redis"
+      last_response.should be_ok
+      last_response.body == "okay"
+    end
+  end
+
   describe "POST /config" do
     it "should call redis#config set value" do
       stub_redis_cmd :config, :set, :param, 'value'
