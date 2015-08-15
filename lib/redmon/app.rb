@@ -85,5 +85,6 @@ module Redmon
         redis.zrange(stats_key, count, -1).to_json
       end
     end
+
   end
 end

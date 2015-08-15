@@ -47,6 +47,7 @@ Usage: /Users/sean/codez/steelThread/redmon/vendor/ruby/1.9.1/bin/redmon (option
     -i, --interval SECS              Poll interval in secs for the worker (default: 10)
     -p, --port PORT                  The thin bind port for the app (default: 4567)
     -r, --redis URL                  The Redis url for monitor (default: redis://127.0.0.1:6379)
+    -B, --base-url BASE_URL          Base URL to mount the app on (default: '')
     -s, --secure CREDENTIALS         Use basic auth. Colon separated credentials, eg admin:admin.
         --no-app                     Do not run the web app to present stats
         --no-worker                  Do not run a worker to collect the stats
@@ -156,6 +157,36 @@ end
 ```
 
 This will mount the Redmon application to the /redmon path.
+
+## Using Standalone with Nginx
+
+Create a config for your daemon monitoring tool of choice (supervisord is awesome, btw...):
+
+```ini
+[program:redmon]
+directory = /var/empty
+command = /usr/local/bin/redmon -B /path/to/redmon -a 0.0.0.0 -p 3000 -r redis://127.0.0.1:6379
+autostart = true
+autorestart = true
+redirect_stderr = true
+```
+
+Use your daemon tool to run the app:
+
+```bash
+supervisorctl reload  # This will automatically pick up and run new supervisor configs.
+```
+
+Add the proxying config to nginx:
+```conf
+location /path/to/redmon {
+        rewrite /path/to/redmon/(.*(?:\.(css|js))) /$1 break;
+
+        proxy_pass http://127.0.0.1:3000;
+        include proxy_params;
+        proxy_buffering off;
+}
+```
 
 ## License
 
