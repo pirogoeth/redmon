@@ -160,6 +160,9 @@ This will mount the Redmon application to the /redmon path.
 
 ## Using Standalone with Nginx
 
+Note that `-B BASE_URL` is totally optional, it's just provided in the case that you want to mount
+Redmon on a different URL.
+
 Create a config for your daemon monitoring tool of choice (supervisord is awesome, btw...):
 
 ```ini
@@ -180,7 +183,7 @@ supervisorctl reload  # This will automatically pick up and run new supervisor c
 Add the proxying config to nginx:
 ```conf
 location /path/to/redmon {
-        rewrite /path/to/redmon/(.*(?:\.(css|js))) /$1 break;
+        rewrite /path/to/redmon/(.*(?:\.(css|js))) /$1 break;  # Only need this if you mounted Redmon elsewhere.
 
         proxy_pass http://127.0.0.1:3000;
         include proxy_params;
