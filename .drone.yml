@@ -1,0 +1,12 @@
+image: ruby:2.0.0
+script:
+  - bundle install
+  - rake
+  - rake install
+notify:
+  slack:
+    webhook_url: $$SLACK_URL
+    channel: $$SLACK_CHANNEL
+    on_started: true
+    on_success: true
+    on_failure: true

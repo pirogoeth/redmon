@@ -183,6 +183,7 @@ supervisorctl reload  # This will automatically pick up and run new supervisor c
 Add the proxying config to nginx:
 ```conf
 location /path/to/redmon {
+        rewrite /path/to/redmon$ /path/to/redmon/ permanent;
         rewrite /path/to/redmon/(.*(?:\.(css|js))) /$1 break;  # Only need this if you mounted Redmon elsewhere.
 
         proxy_pass http://127.0.0.1:3000;
